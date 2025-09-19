@@ -32,6 +32,7 @@ var (
 	uidEnv         = os.Getenv("UID")
 	gidEnv         = os.Getenv("GID")
 	storagePathEnv = os.Getenv("STORAGE_PATH")
+	podNameEnv     = os.Getenv("POD_NAME")
 )
 
 func main() {
@@ -152,6 +153,7 @@ func prefixPort(port string) string {
 }
 
 type response struct {
+	Pod     string          `json:"pod,omitempty"`
 	Error   string          `json:"error,omitempty"`
 	Message string          `json:"message,omitempty"`
 	Files   []nfs4.FileInfo `json:"files,omitempty"`
@@ -162,6 +164,8 @@ type response struct {
 
 func (r *response) handle() {
 	r.writer.Header().Set("Content-Type", "application/json")
+	r.Pod = podNameEnv
+
 	if r.err != nil {
 		r.Error = "something went wrong"
 		r.logger.Error(r.err.Error())
