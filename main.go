@@ -76,7 +76,7 @@ func main() {
 	http.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Query().Get("path")
 		if path == "" {
-			path = "."
+			path = "/"
 		}
 
 		entries, err := client.GetFileList(path)
