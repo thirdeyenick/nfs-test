@@ -69,7 +69,7 @@ func main() {
 	})
 
 	http.HandleFunc("/write-storage", func(w http.ResponseWriter, r *http.Request) {
-		response := response{writer: w, logger: logger}
+		response := &response{writer: w, logger: logger}
 		defer response.handle()
 
 		if storagePathEnv == "" {
@@ -90,7 +90,7 @@ func main() {
 	})
 
 	http.HandleFunc("/read-storage", func(w http.ResponseWriter, r *http.Request) {
-		response := response{writer: w, logger: logger}
+		response := &response{writer: w, logger: logger}
 		defer response.handle()
 
 		if storagePathEnv == "" {
@@ -107,7 +107,7 @@ func main() {
 	})
 
 	http.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
-		response := response{writer: w, logger: logger}
+		response := &response{writer: w, logger: logger}
 		defer response.handle()
 
 		initCtx, cancel := context.WithTimeout(context.Background(), timeout)
@@ -160,7 +160,7 @@ type response struct {
 	err     error
 }
 
-func (r response) handle() {
+func (r *response) handle() {
 	r.writer.Header().Set("Content-Type", "application/json")
 	if r.err != nil {
 		r.Error = "something went wrong"
