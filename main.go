@@ -59,21 +59,25 @@ func main() {
 		log.Fatalf("can not parse GID env variable: %v", err)
 	}
 
-	initCtx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
-	auth := nfs4.AuthParams{
-		Uid:         uint32(uid),
-		Gid:         uint32(gid),
-		MachineName: machineName,
-	}
-	client, err := nfs4.NewNfsClient(initCtx, server, auth)
-
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
 
 	http.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
+		initCtx, cancel := context.WithTimeout(context.Background(), timeout)
+		defer cancel()
+
+		auth := nfs4.AuthParams{
+			Uid:         uint32(uid),
+			Gid:         uint32(gid),
+			MachineName: machineName,
+		}
+		client, err := nfs4.NewNfsClient(initCtx, server, auth)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error creating NFS client: %v", err), http.StatusInternalServerError)
+			return
+		}
+
 		path := r.URL.Query().Get("path")
 		if path == "" {
 			path = "/"
