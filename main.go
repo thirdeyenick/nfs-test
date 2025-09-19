@@ -104,5 +104,5 @@ func prefixPort(port string) string {
 	if strings.HasPrefix(port, ":") {
 		return port
 	}
-	return port + ":"
+	return ":" + port
 }
