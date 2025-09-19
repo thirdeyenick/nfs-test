@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Cyberax/go-nfs-client/nfs4"
@@ -94,7 +95,14 @@ func main() {
 	})
 
 	log.Printf("Serving on %s (NFS %s:%s)", listenPort, server, share)
-	if err := http.ListenAndServe(listenPort, nil); err != nil {
+	if err := http.ListenAndServe(prefixPort(listenPort), nil); err != nil {
 		log.Fatalf("HTTP server error: %v", err)
 	}
+}
+
+func prefixPort(port string) string {
+	if strings.HasPrefix(port, ":") {
+		return port
+	}
+	return port + ":"
 }
