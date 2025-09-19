@@ -85,13 +85,11 @@ func main() {
 			return
 		}
 
-		out := []nfs4.FileInfo{}
-		for _, e := range entries {
-			out = append(out, e)
-		}
-
 		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(out)
+		if err := json.NewEncoder(w).Encode(entries); err != nil {
+			http.Error(w, fmt.Sprintf("can not convert to json output reading dir %q: %v", path, err), http.StatusInternalServerError)
+			return
+		}
 	})
 
 	log.Printf("Serving on %s (NFS %s:%s)", listenPort, server, share)
