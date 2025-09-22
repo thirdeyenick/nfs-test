@@ -293,10 +293,12 @@ func setupSqlite(ctx context.Context, storagePath string, podName string, logger
 				return
 			case <-ticker.C:
 				var count int
+				if err := db.QueryRow("SELECT COUNT(*) FROM entries").Scan(&count); err != nil {
+					logger.Error("read count failed", slog.Any("err", err))
+				}
 				var lastPod, lastTS, lastPayload string
-				err := db.QueryRow(
-					"SELECT COUNT(*), (SELECT pod FROM entries ORDER BY id DESC LIMIT 1), (SELECT ts FROM entries ORDER BY id DESC LIMIT 1), (SELECT payload FROM entries ORDER BY id DESC LIMIT 1)",
-				).Scan(&count, &lastPod, &lastTS, &lastPayload)
+				err := db.QueryRow("SELECT pod, ts, payload FROM entries ORDER BY id DESC LIMIT 1").
+					Scan(&lastPod, &lastTS, &lastPayload)
 				if err != nil {
 					logger.Error("read error", slog.Any("error", err))
 				} else {
