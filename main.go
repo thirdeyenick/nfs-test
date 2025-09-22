@@ -295,6 +295,7 @@ func setupSqlite(ctx context.Context, storagePath string, podName string, logger
 				var count int
 				if err := db.QueryRow("SELECT COUNT(*) FROM entries").Scan(&count); err != nil {
 					logger.Error("read count failed", slog.Any("err", err))
+					continue
 				}
 				var lastPod, lastTS, lastPayload string
 				err := db.QueryRow("SELECT pod, ts, payload FROM entries ORDER BY id DESC LIMIT 1").
@@ -303,6 +304,17 @@ func setupSqlite(ctx context.Context, storagePath string, podName string, logger
 					logger.Error("read error", slog.Any("error", err))
 				} else {
 					logger.Info("successful read", "count", count, "lastPod", lastPod, "lastTimestamp", lastTS, "lastPayload", lastPayload)
+				}
+				// if we have more than 10k entries, we delete everything
+				if count > 10000 {
+					_, err := db.Exec("DELETE FROM entries")
+					if err != nil {
+						logger.Error("cleanup failed", slog.Any("err", err))
+					} else {
+						logger.Warn("database cleaned up",
+							slog.Int("previous_count", count),
+						)
+					}
 				}
 			}
 		}
