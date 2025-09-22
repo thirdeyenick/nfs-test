@@ -7,5 +7,5 @@ toolchain go1.23.0
 require (
 	github.com/Cyberax/go-nfs-client v1.0.1-0.20211103065114-eeba7350de5b
 	github.com/mattn/go-sqlite3 v1.14.32
-	golang.org/x/exp v0.0.0-20250911091902-df9299821621
+	golang.org/x/exp v0.0.0-20250808145144-a408d31f581a
 )
